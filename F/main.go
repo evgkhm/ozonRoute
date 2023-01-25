@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"time"
 )
@@ -17,12 +18,8 @@ func main() {
 	fmt.Fscan(in, &otrezki) //6
 
 	for i := 0; i < otrezki; i++ {
-		//res := "YES"
 		var otrezok int //5
 		fmt.Fscan(in, &otrezok)
-
-		//prevReport := 0
-		//m := make(map[int]bool) //мапа с отчетами
 		res := "YES"
 		for j := 0; j < otrezok; j++ {
 			var date, rawLeftDate, rawRightDate string
@@ -40,11 +37,21 @@ func main() {
 				//res = "YES"
 			} else {
 				res = "NO"
+				continue
 			}
 			//rightSecs := t.Second()
-			//fmt.Fprintln(out, diff)
-			//fmt.Fprintln(out, leftDate, rightDate)
 
+			//intDate, _ := strconv.Atoi(date)
+			var timeSlice []time.Time
+			if otrezok > 1 {
+				timeSlice = append(timeSlice, leftTime)
+				timeSlice = append(timeSlice, rightTime)
+
+				sort.Slice(timeSlice, func(i, j int) bool {
+					return timeSlice[i].Before(timeSlice[j])
+				})
+			}
+			fmt.Fprintln(out, timeSlice)
 		}
 		fmt.Fprintln(out, res)
 	}
