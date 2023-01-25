@@ -21,6 +21,7 @@ func main() {
 		var otrezok int //5
 		fmt.Fscan(in, &otrezok)
 		res := "YES"
+
 		for j := 0; j < otrezok; j++ {
 			var date, rawLeftDate, rawRightDate string
 			fmt.Fscan(in, &date)
@@ -40,8 +41,6 @@ func main() {
 				continue
 			}
 			//rightSecs := t.Second()
-
-			//intDate, _ := strconv.Atoi(date)
 			var timeSlice []time.Time
 			if otrezok > 1 {
 				timeSlice = append(timeSlice, leftTime)
@@ -53,6 +52,7 @@ func main() {
 			}
 			fmt.Fprintln(out, timeSlice)
 		}
+
 		fmt.Fprintln(out, res)
 	}
 
