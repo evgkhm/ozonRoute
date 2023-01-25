@@ -41,10 +41,12 @@ func main() {
 				continue
 			}
 			//rightSecs := t.Second()
-			var timeSlice []time.Time
+			var timeSliceLeft []time.Time
+			var timeSliceRight []time.Time
+
 			if otrezok > 1 {
-				timeSlice = append(timeSlice, leftTime)
-				timeSlice = append(timeSlice, rightTime)
+				timeSliceLeft = append(timeSliceLeft, leftTime)
+				timeSliceRight = append(timeSliceRight, rightTime)
 
 				sort.Slice(timeSlice, func(i, j int) bool {
 					return timeSlice[i].Before(timeSlice[j])
