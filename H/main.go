@@ -16,7 +16,7 @@ func main() {
 	var testCount int
 	fmt.Fscan(in, &testCount)
 
-	res := "YES"
+	//res := "YES"
 	for i := 0; i < testCount; i++ {
 
 		fmt.Fscan(in, &stroka, &stolbec)
@@ -45,34 +45,55 @@ func main() {
 			n++
 		}
 
-		res = Calc(slice)
+		res := Calc(slice)
 
-		fmt.Fprintln(out, slice)
+		fmt.Fprintln(out, res)
 	}
 }
 
-func FindAndDelete(cellN int, cellM int, slice [][]string) (int, int, [][]string) {
-	/*if currCell != prevCell {
-		break
-	}*/
+func FindAndDeleteRight(cellN int, cellM int, slice [][]string, targetCell string) [][]string {
+	if cellM >= stolbec || cellN >= stroka {
+		return slice
+	}
+
 	currCell := slice[cellN][cellM]
-	return FindAndDelete(cellN+2, cellM+2, slice)
+
+	if currCell == "." {
+		cellM++
+		FindAndDeleteRight(cellN, cellM, slice, targetCell)
+	}
+	//переход на след строку
+	if cellM >= stolbec || currCell != targetCell {
+		cellM = 0
+		cellN += 1
+		FindAndDeleteRight(cellN, cellM, slice, targetCell)
+	}
+
+	if cellM >= stolbec || cellN >= stroka {
+		return slice
+	}
+	slice[cellN][cellM] = "."
+
+	//переход на след столбец
+	cellM += 2
+
+	FindAndDeleteRight(cellN, cellM, slice, targetCell)
+	return slice
 }
 
 func Calc(slice [][]string) string {
 	res := "YES"
-	prevSymbol := slice[0][0]
+	targetCell := slice[0][0]
 	cellN := 0
 	cellM := 0
-	FindAndDelete(cellN, cellM, slice)
-	/*
-		var region []
-		for n := 0; n < stroka; n++ {
-			for m := 2; m < stolbec; m++ {
-				if slice[n][m] == prevSymbol {
-
-				}
+	slice = FindAndDeleteRight(cellN, cellM, slice, targetCell)
+	for _, str := range slice {
+		for _, val := range str {
+			if val == targetCell {
+				res = "NO"
 			}
-		}*/
+		}
+	}
+
 	return res
 }
