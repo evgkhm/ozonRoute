@@ -8,6 +8,11 @@ import (
 
 var stroka, stolbec int
 
+type Coordinates struct {
+	cellN, cellM, nextN, nextM int
+	targetCell                 string
+}
+
 func main() {
 	in := bufio.NewReader(os.Stdin)
 	out := bufio.NewWriter(os.Stdout)
@@ -45,55 +50,72 @@ func main() {
 			n++
 		}
 
-		res := Calc(slice)
+		//start := slice[0][0]
+		cells := &Coordinates{}
+		cells.targetCell = slice[0][0]
+
+		endStr := stroka - 1
+		endStolb := stolbec - 1
+		res := "YES"
+		for slice[endStr][endStolb] != "." && res == "YES" {
+			res = Calc(cells, slice)
+		}
 
 		fmt.Fprintln(out, res)
 	}
 }
 
-func FindAndDeleteRight(cellN int, cellM int, slice [][]string, targetCell string) [][]string {
-	if cellM >= stolbec || cellN >= stroka {
+func FindAndDeleteRight(cells *Coordinates, slice [][]string) [][]string {
+	if cells.cellM >= stolbec || cells.cellN >= stroka {
 		return slice
 	}
 
-	currCell := slice[cellN][cellM]
+	currCell := slice[cells.cellN][cells.cellM]
 
 	if currCell == "." {
-		cellM++
-		FindAndDeleteRight(cellN, cellM, slice, targetCell)
+		cells.cellM++
+		FindAndDeleteRight(cells, slice)
+	} else if currCell != cells.targetCell { //попадание в след символ
+		cells.nextN = cells.cellN
+		cells.nextM = cells.cellM
 	}
 	//переход на след строку
-	if cellM >= stolbec || currCell != targetCell {
-		cellM = 0
-		cellN += 1
-		FindAndDeleteRight(cellN, cellM, slice, targetCell)
+	if cells.cellM >= stolbec || currCell != cells.targetCell {
+		cells.cellM = 0
+		cells.cellN += 1
+		FindAndDeleteRight(cells, slice)
 	}
 
-	if cellM >= stolbec || cellN >= stroka {
+	if cells.cellM >= stolbec || cells.cellN >= stroka {
 		return slice
 	}
-	slice[cellN][cellM] = "."
+	slice[cells.cellN][cells.cellM] = "."
 
 	//переход на след столбец
-	cellM += 2
+	cells.cellM += 2
 
-	FindAndDeleteRight(cellN, cellM, slice, targetCell)
+	FindAndDeleteRight(cells, slice)
 	return slice
 }
 
-func Calc(slice [][]string) string {
+func Calc(cells *Coordinates, slice [][]string) string {
 	res := "YES"
-	targetCell := slice[0][0]
-	cellN := 0
-	cellM := 0
-	slice = FindAndDeleteRight(cellN, cellM, slice, targetCell)
+	//targetCell := slice[0][0]
+	//cellN := 0
+	//cellM := 0
+	//cells := &Coordinates{}
+	slice = FindAndDeleteRight(cells, slice)
+	//проверка что нет островов
 	for _, str := range slice {
 		for _, val := range str {
-			if val == targetCell {
+			if val == cells.targetCell {
 				res = "NO"
+				return res
 			}
 		}
 	}
-
+	cells.cellN = cells.nextN
+	cells.cellM = cells.nextM
+	cells.targetCell = slice[cells.nextN][cells.nextM]
 	return res
 }
