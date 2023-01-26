@@ -11,6 +11,7 @@ var stroka, stolbec int
 type Coordinates struct {
 	cellN, cellM, nextN, nextM int
 	targetCell                 string
+	foundNext                  bool
 }
 
 func main() {
@@ -75,9 +76,10 @@ func FindAndDeleteRight(cells *Coordinates, slice [][]string) [][]string {
 	if currCell == "." {
 		cells.cellM++
 		FindAndDeleteRight(cells, slice)
-	} else if currCell != cells.targetCell { //попадание в след символ
+	} else if currCell != cells.targetCell && cells.foundNext == false { //попадание в след символ
 		cells.nextN = cells.cellN
 		cells.nextM = cells.cellM
+		cells.foundNext = true
 	}
 	//переход на след строку
 	if cells.cellM >= stolbec || currCell != cells.targetCell {
@@ -100,10 +102,7 @@ func FindAndDeleteRight(cells *Coordinates, slice [][]string) [][]string {
 
 func Calc(cells *Coordinates, slice [][]string) string {
 	res := "YES"
-	//targetCell := slice[0][0]
-	//cellN := 0
-	//cellM := 0
-	//cells := &Coordinates{}
+
 	slice = FindAndDeleteRight(cells, slice)
 	//проверка что нет островов
 	for _, str := range slice {
@@ -114,8 +113,10 @@ func Calc(cells *Coordinates, slice [][]string) string {
 			}
 		}
 	}
+	//новый цикл поиска
 	cells.cellN = cells.nextN
 	cells.cellM = cells.nextM
 	cells.targetCell = slice[cells.nextN][cells.nextM]
+	cells.foundNext = false
 	return res
 }
