@@ -67,8 +67,12 @@ func main() {
 }
 
 func FindAndDeleteRight(cells *Coordinates, slice [][]string) [][]string {
-	if cells.cellM >= stolbec || cells.cellN >= stroka {
+	if cells.cellM >= stolbec && cells.cellN >= stroka {
 		return slice
+	} else if cells.cellM >= stolbec /*|| currCell != cells.targetCell*/ {
+		cells.cellM = 0
+		cells.cellN += 1
+		FindAndDeleteRight(cells, slice)
 	}
 
 	currCell := slice[cells.cellN][cells.cellM]
@@ -82,11 +86,11 @@ func FindAndDeleteRight(cells *Coordinates, slice [][]string) [][]string {
 		cells.foundNext = true
 	}
 	//переход на след строку
-	if cells.cellM >= stolbec || currCell != cells.targetCell {
+	/*if cells.cellM >= stolbec || currCell != cells.targetCell {
 		cells.cellM = 0
 		cells.cellN += 1
 		FindAndDeleteRight(cells, slice)
-	}
+	}*/
 
 	if cells.cellM >= stolbec || cells.cellN >= stroka {
 		return slice
