@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -26,14 +27,27 @@ func (i Interval) Swap(k, j int) {
 	i[k], i[j] = i[j], i[k]
 }
 
-func Check(rawLeftDate, rawRightDate string) bool {
+func Check(rawDate string) bool {
+	raw := strings.Split(rawDate, ":")
+	sec, _ := strconv.Atoi(raw[2])
+	min, _ := strconv.Atoi(raw[1])
+	hour, _ := strconv.Atoi(raw[0])
 
-	if leftTime.Second() > 59 || rightTime.Second() > 59 ||
-		leftTime.Minute() > 59 || rightTime.Minute() > 59 ||
-		leftTime.Hour() > 23 || rightTime.Hour() > 23 {
-		res = "NO"
-		continue
+	if sec > 59 || min > 59 || hour > 23 {
+		return false
 	}
+	return true
+}
+
+func AnotherCheck(leftTime, rightTime time.Time) bool {
+	if leftTime.Before(rightTime) == true || leftTime.Equal(rightTime) == true {
+		//res = "YES"
+	} else {
+		//res = "NO"
+		//continue
+		return false
+	}
+	return true
 }
 
 func main() {
@@ -57,27 +71,26 @@ func main() {
 			tmp := strings.Split(date, "-")
 			rawLeftDate = tmp[0]
 			rawRightDate = tmp[1]
-			check := Check(rawLeftDate, rawRightDate)
+			check := Check(rawLeftDate)
 			if check == false {
 				res = "NO"
 				continue
 			}
+			check = Check(rawRightDate)
+			if check == false {
+				res = "NO"
+				continue
+			}
+
 			layout := "15:04:05"
 			leftTime, _ := time.Parse(layout, rawLeftDate)
 			rightTime, _ := time.Parse(layout, rawRightDate)
 
-			if leftTime.Before(rightTime) == true || leftTime.Equal(rightTime) == true {
-				//res = "YES"
-			} else {
+			check = AnotherCheck(leftTime, rightTime)
+			if check == false {
 				res = "NO"
 				continue
 			}
-			/*if leftTime.Second() > 59 || rightTime.Second() > 59 ||
-				leftTime.Minute() > 59 || rightTime.Minute() > 59 ||
-				leftTime.Hour() > 23 || rightTime.Hour() > 23 {
-				res = "NO"
-				continue
-			}*/
 			//перевод в секунды
 			intervals[j].leftTime = leftTime.Second() + (leftTime.Minute() * 60) + (leftTime.Hour() * 60 * 60)
 			intervals[j].rightTime = rightTime.Second() + (rightTime.Minute() * 60) + (rightTime.Hour() * 60 * 60)
