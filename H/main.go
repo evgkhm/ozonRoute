@@ -9,9 +9,16 @@ import (
 var stroka, stolbec int
 
 type Coordinates struct {
-	cellN, cellM, nextN, nextM int
-	targetCell                 string
-	foundNext                  bool
+	cellN, cellM /*, nextN, nextM*/ int
+	//targetCell                 string
+	//foundNext                  bool
+}
+
+type Tree struct {
+	Left   *Tree
+	Right  *Tree
+	Parent *Tree
+	N, M   int
 }
 
 func main() {
@@ -51,61 +58,111 @@ func main() {
 			n++
 		}
 
-		//start := slice[0][0]
+		start := slice[0][0]
 		cells := &Coordinates{}
-		cells.targetCell = slice[0][0]
+		//cells.targetCell = slice[0][0]
 
 		endStr := stroka - 1
 		endStolb := stolbec - 1
 		res := "YES"
 		for slice[endStr][endStolb] != "." && res == "YES" {
-			res = Calc(cells, slice)
+			res = Calc(cells, slice, start)
 		}
 
 		fmt.Fprintln(out, res)
 	}
 }
 
-func FindAndDelete(cells *Coordinates, slice [][]string) [][]string {
-	if cells.cellN >= stroka && cells.cellM >= stolbec {
-		return slice
+//func FindAndDelete(cells *Coordinates, slice [][]string) [][]string {
+//	if cells.cellN >= stroka && cells.cellM >= stolbec {
+//		return slice
+//	}
+//	if cells.cellM >= stolbec { //переход на след строку
+//		cells.cellM = 0
+//		cells.cellN += 1
+//	}
+//	if cells.cellN >= stroka {
+//		return slice
+//	}
+//
+//	currCell := slice[cells.cellN][cells.cellM]
+//
+//	if currCell == cells.targetCell { //удаление цвета
+//		slice[cells.cellN][cells.cellM] = "."
+//	} else if currCell != "." && currCell != cells.targetCell && cells.foundNext == false { //другой символ
+//		cells.nextN = cells.cellN
+//		cells.nextM = cells.cellM
+//		cells.foundNext = true
+//
+//	} else if currCell != "." && currCell != cells.targetCell { //другой символ
+//		cells.cellM += stolbec //выход за рамки, переход на след строку
+//	}
+//
+//	//переход на след столбец
+//	cells.cellM += 1
+//
+//	FindAndDelete(cells, slice)
+//	return slice
+//}
+
+func FindAndDelete(cells *Coordinates, slice [][]string, start string, processed *map[int]map[int]bool) [][]string {
+	//if cells.cellN >= stroka || cells.cellM >= stolbec {
+	//	return slice
+	//} else if cells.cellN < 0 || cells.cellM < 0 {
+	//	return slice
+	//}
+	//
+	//currCell := slice[cells.cellN][cells.cellM]
+	//
+	//if currCell == cells.targetCell { //удаление цвета
+	//	slice[cells.cellN][cells.cellM] = "."
+	//}
+	//
+	//if currCell != "." && currCell != cells.targetCell && cells.foundNext == false { //другой символ
+	//	cells.nextN = cells.cellN
+	//	cells.nextM = cells.cellM
+	//	cells.foundNext = true
+	//}
+	//
+	//FindAndDelete(cells, slice)
+	//return slice
+	nextLevelVertices := make([]Coordinates, 0) // очередь для соседей
+	for n, value := range slice {
+		for m, val := range value {
+			if (*processed)[n][m] {
+				continue // не перебираем одну вершину два раза
+			}
+			if val == start {
+				val = "."
+				nextLevelVertices = append(nextLevelVertices, Coordinates{n, m})
+			} /* else { //добавить в очередь этого соседа
+				cell := Coordinates{cellM: m, cellN: n}
+				nextLevelVertices = append(nextLevelVertices, cell)
+			}*/
+			(*processed)[n][m] = true
+			if val != start {
+				continue
+			}
+		}
 	}
-	if cells.cellM >= stolbec { //переход на след строку
-		cells.cellM = 0
-		cells.cellN += 1
-	}
-	if cells.cellN >= stroka {
-		return slice
-	}
-
-	currCell := slice[cells.cellN][cells.cellM]
-
-	if currCell == cells.targetCell { //удаление цвета
-		slice[cells.cellN][cells.cellM] = "."
-	} else if currCell != "." && currCell != cells.targetCell && cells.foundNext == false { //другой символ
-		cells.nextN = cells.cellN
-		cells.nextM = cells.cellM
-		cells.foundNext = true
-
-	} else if currCell != "." && currCell != cells.targetCell { //другой символ
-		cells.cellM += stolbec //выход за рамки, переход на след строку
-	}
-
-	//переход на след столбец
-	cells.cellM += 1
-
-	FindAndDelete(cells, slice)
 	return slice
 }
 
-func Calc(cells *Coordinates, slice [][]string) string {
-	res := "YES"
+func New(N, M int) *Tree {
+	var t *Tree
+	return t
+}
 
-	slice = FindAndDelete(cells, slice)
+func Calc(cells *Coordinates, slice [][]string, start string) string {
+	res := "YES"
+	stack := New(0, 0)
+
+	processed := map[int]map[int]bool{} //обработанные ячейки
+	FindAndDelete(cells, slice, start, &processed, stack)
 	//проверка что нет островов
 	for _, str := range slice {
 		for _, val := range str {
-			if val == cells.targetCell {
+			if val == start {
 				res = "NO"
 				return res
 			}
