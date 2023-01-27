@@ -66,42 +66,39 @@ func main() {
 	}
 }
 
-func FindAndDelete(cells *Coordinates, slice [][]string) [][]string {
-	if cells.cellN >= stroka && cells.cellM >= stolbec {
-		return slice
+func FindAndDelete(cells *Coordinates, slice [][]string, processed map[int]bool) [][]string {
+	count := 0
+	for n, value := range slice {
+		for m, val := range value {
+			//if processed[n][m] {
+			//	continue // не перебираем одну вершину два раза
+			//}
+			if _, ok := processed[m]; ok {
+				continue
+			}
+			processed[m] = true
+
+			if val == cells.targetCell { //удаление из слайса
+				slice[n][m] = "."
+				FindAndDelete(cells, slice, processed)
+			}
+
+			if val != cells.targetCell && val != "." { //конец обхода
+				cells.nextN = n
+				cells.nextN = m
+				return slice
+			}
+		}
 	}
-	if cells.cellM >= stolbec { //переход на след строку
-		cells.cellM = 0
-		cells.cellN += 1
-	}
-	if cells.cellN >= stroka {
-		return slice
-	}
 
-	currCell := slice[cells.cellN][cells.cellM]
-
-	if currCell == cells.targetCell { //удаление цвета
-		slice[cells.cellN][cells.cellM] = "."
-	} else if currCell != "." && currCell != cells.targetCell && cells.foundNext == false { //другой символ
-		cells.nextN = cells.cellN
-		cells.nextM = cells.cellM
-		cells.foundNext = true
-
-	} else if currCell != "." && currCell != cells.targetCell { //другой символ
-		cells.cellM += stolbec //выход за рамки, переход на след строку
-	}
-
-	//переход на след столбец
-	cells.cellM += 1
-
-	FindAndDelete(cells, slice)
 	return slice
 }
 
 func Calc(cells *Coordinates, slice [][]string) string {
 	res := "YES"
+	processed := make(map[int]bool) //обработанные ячейки
 
-	slice = FindAndDelete(cells, slice)
+	slice = FindAndDelete(cells, slice, processed)
 	//проверка что нет островов
 	for _, str := range slice {
 		for _, val := range str {
