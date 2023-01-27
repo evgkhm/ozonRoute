@@ -66,48 +66,42 @@ func main() {
 	}
 }
 
-func FindAndDeleteRight(cells *Coordinates, slice [][]string) [][]string {
-	if cells.cellM >= stolbec && cells.cellN >= stroka {
+func FindAndDelete(cells *Coordinates, slice [][]string) [][]string {
+	if cells.cellN >= stroka && cells.cellM >= stolbec {
 		return slice
-	} else if cells.cellM >= stolbec /*|| currCell != cells.targetCell*/ {
+	}
+	if cells.cellM >= stolbec { //переход на след строку
 		cells.cellM = 0
 		cells.cellN += 1
-		FindAndDeleteRight(cells, slice)
+	}
+	if cells.cellN >= stroka {
+		return slice
 	}
 
 	currCell := slice[cells.cellN][cells.cellM]
 
-	if currCell == "." {
-		cells.cellM++
-		FindAndDeleteRight(cells, slice)
-	} else if currCell != cells.targetCell && cells.foundNext == false { //попадание в след символ
+	if currCell == cells.targetCell { //удаление цвета
+		slice[cells.cellN][cells.cellM] = "."
+	} else if currCell != "." && currCell != cells.targetCell && cells.foundNext == false { //другой символ
 		cells.nextN = cells.cellN
 		cells.nextM = cells.cellM
 		cells.foundNext = true
-	}
-	//переход на след строку
-	/*if cells.cellM >= stolbec || currCell != cells.targetCell {
-		cells.cellM = 0
-		cells.cellN += 1
-		FindAndDeleteRight(cells, slice)
-	}*/
 
-	if cells.cellM >= stolbec || cells.cellN >= stroka {
-		return slice
+	} else if currCell != "." && currCell != cells.targetCell { //другой символ
+		cells.cellM += stolbec //выход за рамки, переход на след строку
 	}
-	slice[cells.cellN][cells.cellM] = "."
 
 	//переход на след столбец
-	cells.cellM += 2
+	cells.cellM += 1
 
-	FindAndDeleteRight(cells, slice)
+	FindAndDelete(cells, slice)
 	return slice
 }
 
 func Calc(cells *Coordinates, slice [][]string) string {
 	res := "YES"
 
-	slice = FindAndDeleteRight(cells, slice)
+	slice = FindAndDelete(cells, slice)
 	//проверка что нет островов
 	for _, str := range slice {
 		for _, val := range str {
