@@ -67,108 +67,92 @@ func main() {
 	}
 }
 
-func FindAndDelete(cells *Coordinates, slice [][]string) [][]string {
-	processed := make(map[Coordinates]bool) //обработанные ячейки
+func FindAndDelete(cells *Coordinates, slice [][]string, processed map[Coordinates]bool) [][]string {
 
-	for n, value := range slice {
-		for m, val := range value {
+	for n := cells.cellN; n < stroka; n++ {
+		for m := cells.cellM; m < stolbec; m++ {
 			cells.cellN = n
 			cells.cellM = m
-
 			if _, ok := processed[*cells]; ok {
 				continue
 			}
 			processed[*cells] = true
 
-			if val != cells.targetCell && val != "." && cells.foundNext == false { //новый цвет
+			val := slice[n][m]
+			/*if val != cells.targetCell && val != "." && cells.foundNext == false { //новый цвет
 				cells.nextTargetCell = val
+				cells.nextN = n
+				cells.nextM = m
 				cells.foundNext = true
 				continue
-			}
+			}*/
 
 			if val == "." {
 				continue
 			}
+
 			if val == cells.targetCell {
-				isNeighbors := false
 				slice[n][m] = "."
 
 				if m+1 < stolbec && n-1 > 0 { //сосед справа наверху
-					cells.cellN = n - 1
-					cells.cellM = m + 1
-					processed[*cells] = true
 					if slice[n-1][m+1] == cells.targetCell {
-						slice[n-1][m+1] = "."
-						isNeighbors = true
+						cells.cellN = n - 1
+						cells.cellM = m + 1
+						FindAndDelete(cells, slice, processed)
 					}
 				}
 				if m+2 < stolbec { //сосед справа
-					cells.cellM = m + 2
-					processed[*cells] = true
 					if slice[n][m+2] == cells.targetCell {
-						slice[n][m+2] = "."
-						isNeighbors = true
+						cells.cellN = n
+						cells.cellM = m + 2
+						FindAndDelete(cells, slice, processed)
 					}
 				}
 				if m+1 < stolbec && n+1 < stroka { //сосед справа внизу
-					cells.cellN = n + 1
-					cells.cellM = m + 1
-					processed[*cells] = true
 					if slice[n+1][m+1] == cells.targetCell {
-						slice[n+1][m+1] = "."
-						isNeighbors = true
+						cells.cellN = n + 1
+						cells.cellM = m + 1
+						FindAndDelete(cells, slice, processed)
 					}
 				}
 				if n+2 < stroka { //сосед внизу
-					cells.cellN = n + 2
-					processed[*cells] = true
 					if slice[n+2][m] == cells.targetCell {
-						slice[n+2][m] = "."
-						isNeighbors = true
+						cells.cellN = n + 2
+						cells.cellM = m
+						FindAndDelete(cells, slice, processed)
 					}
 				}
 				if m-1 > 0 && n+1 < stroka { //сосед слева внизу
-					cells.cellN = n + 1
-					cells.cellM = m - 1
-					processed[*cells] = true
 					if slice[n+1][m-1] == cells.targetCell {
-						slice[n+1][m-1] = "."
-						isNeighbors = true
-
+						cells.cellN = n + 1
+						cells.cellM = m - 1
+						FindAndDelete(cells, slice, processed)
 					}
 				}
 				if m-2 > 0 { //сосед слева
-					cells.cellM = m - 2
-					processed[*cells] = true
 					if slice[n][m-2] == cells.targetCell {
-						slice[n][m-2] = "."
-						isNeighbors = true
+						cells.cellN = n
+						cells.cellM = m - 2
+						FindAndDelete(cells, slice, processed)
 					}
 				}
 
 				if m-1 > 0 && n-1 > 0 { //сосед слева наверху
-					cells.cellN = n - 1
-					cells.cellM = m - 1
-					processed[*cells] = true
 					if slice[n-1][m-1] == cells.targetCell {
-						slice[n-1][m-1] = "."
-						isNeighbors = true
+						cells.cellN = n - 1
+						cells.cellM = m - 1
+						FindAndDelete(cells, slice, processed)
 					}
 				}
 
 				if n-2 > 0 { //сосед наверху
-					cells.cellN = n - 2
-					processed[*cells] = true
 					if slice[n-2][m] == cells.targetCell {
-						slice[n-2][m] = "."
-						isNeighbors = true
+						cells.cellN = n - 2
+						cells.cellM = m
+						FindAndDelete(cells, slice, processed)
 					}
 				}
-
-				if isNeighbors == false { //нет соседей, выход из функции
-					return slice
-				}
-				continue
+				return slice
 			}
 		}
 	}
@@ -179,7 +163,22 @@ func FindAndDelete(cells *Coordinates, slice [][]string) [][]string {
 func Calc(cells *Coordinates, slice [][]string) string {
 	res := "YES"
 
-	slice = FindAndDelete(cells, slice)
+	processed := make(map[Coordinates]bool) //обработанные ячейки
+
+L1:
+	for n, str := range slice {
+		for m, val := range str {
+			if val != "." {
+				cells.cellN = n
+				cells.cellM = m
+				cells.targetCell = val
+				break L1
+			}
+		}
+	}
+
+	slice = FindAndDelete(cells, slice, processed)
+
 	//проверка что нет островов
 	for _, str := range slice {
 		for _, val := range str {
@@ -192,7 +191,7 @@ func Calc(cells *Coordinates, slice [][]string) string {
 	//новый цикл поиска
 	//cells.cellN = cells.nextN
 	//cells.cellM = cells.nextM
-	cells.targetCell = cells.nextTargetCell
-	cells.foundNext = false
+	//cells.targetCell = cells.nextTargetCell
+	//cells.foundNext = false
 	return res
 }
