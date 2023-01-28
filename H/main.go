@@ -11,6 +11,7 @@ var stroka, stolbec int
 type Coordinates struct {
 	cellN, cellM, nextN, nextM int
 	targetCell                 string
+	nextTargetCell             string
 	foundNext                  bool
 }
 
@@ -66,27 +67,30 @@ func main() {
 	}
 }
 
-func FindAndDelete(cells *Coordinates, slice [][]string, processed map[int]bool) [][]string {
-	count := 0
+func FindAndDelete(cells *Coordinates, slice [][]string) [][]string {
+	processed := make(map[Coordinates]bool) //обработанные ячейки
+	//queue := list.New()
+	//queue.PushBack()
 	for n, value := range slice {
 		for m, val := range value {
-			//if processed[n][m] {
-			//	continue // не перебираем одну вершину два раза
-			//}
-			if _, ok := processed[m]; ok {
+			cells.cellN = n
+			cells.cellM = m
+			if _, ok := processed[*cells]; ok {
 				continue
 			}
-			processed[m] = true
+			processed[*cells] = true
 
-			if val == cells.targetCell { //удаление из слайса
-				slice[n][m] = "."
-				FindAndDelete(cells, slice, processed)
+			if val != cells.targetCell && val != "." && cells.foundNext == false { //конец обхода с записей нового цвета
+				cells.nextTargetCell = val
+				cells.foundNext = true
+				break //выход из этой строки
+			} else if val != cells.targetCell && val != "." { //конец обхода
+				break //выход из этой строки
 			}
 
-			if val != cells.targetCell && val != "." { //конец обхода
-				cells.nextN = n
-				cells.nextN = m
-				return slice
+			if val == cells.targetCell {
+				slice[n][m] = "."
+				//FindAndDelete(cells, slice, processed)
 			}
 		}
 	}
@@ -96,9 +100,8 @@ func FindAndDelete(cells *Coordinates, slice [][]string, processed map[int]bool)
 
 func Calc(cells *Coordinates, slice [][]string) string {
 	res := "YES"
-	processed := make(map[int]bool) //обработанные ячейки
 
-	slice = FindAndDelete(cells, slice, processed)
+	slice = FindAndDelete(cells, slice)
 	//проверка что нет островов
 	for _, str := range slice {
 		for _, val := range str {
@@ -109,9 +112,9 @@ func Calc(cells *Coordinates, slice [][]string) string {
 		}
 	}
 	//новый цикл поиска
-	cells.cellN = cells.nextN
-	cells.cellM = cells.nextM
-	cells.targetCell = slice[cells.nextN][cells.nextM]
+	//cells.cellN = cells.nextN
+	//cells.cellM = cells.nextM
+	cells.targetCell = cells.nextTargetCell
 	cells.foundNext = false
 	return res
 }
