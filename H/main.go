@@ -69,28 +69,106 @@ func main() {
 
 func FindAndDelete(cells *Coordinates, slice [][]string) [][]string {
 	processed := make(map[Coordinates]bool) //обработанные ячейки
-	//queue := list.New()
-	//queue.PushBack()
+
 	for n, value := range slice {
 		for m, val := range value {
 			cells.cellN = n
 			cells.cellM = m
+
 			if _, ok := processed[*cells]; ok {
 				continue
 			}
 			processed[*cells] = true
 
-			if val != cells.targetCell && val != "." && cells.foundNext == false { //конец обхода с записей нового цвета
+			if val != cells.targetCell && val != "." && cells.foundNext == false { //новый цвет
 				cells.nextTargetCell = val
 				cells.foundNext = true
-				break //выход из этой строки
-			} else if val != cells.targetCell && val != "." { //конец обхода
-				break //выход из этой строки
+				continue
 			}
 
+			if val == "." {
+				continue
+			}
 			if val == cells.targetCell {
+				isNeighbors := false
 				slice[n][m] = "."
-				//FindAndDelete(cells, slice, processed)
+
+				if m+1 < stolbec && n-1 > 0 { //сосед справа наверху
+					cells.cellN = n - 1
+					cells.cellM = m + 1
+					processed[*cells] = true
+					if slice[n-1][m+1] == cells.targetCell {
+						slice[n-1][m+1] = "."
+						isNeighbors = true
+					}
+				}
+				if m+2 < stolbec { //сосед справа
+					cells.cellM = m + 2
+					processed[*cells] = true
+					if slice[n][m+2] == cells.targetCell {
+						slice[n][m+2] = "."
+						isNeighbors = true
+					}
+				}
+				if m+1 < stolbec && n+1 < stroka { //сосед справа внизу
+					cells.cellN = n + 1
+					cells.cellM = m + 1
+					processed[*cells] = true
+					if slice[n+1][m+1] == cells.targetCell {
+						slice[n+1][m+1] = "."
+						isNeighbors = true
+					}
+				}
+				if n+2 < stroka { //сосед внизу
+					cells.cellN = n + 2
+					processed[*cells] = true
+					if slice[n+2][m] == cells.targetCell {
+						slice[n+2][m] = "."
+						isNeighbors = true
+					}
+				}
+				if m-1 > 0 && n+1 < stroka { //сосед слева внизу
+					cells.cellN = n + 1
+					cells.cellM = m - 1
+					processed[*cells] = true
+					if slice[n+1][m-1] == cells.targetCell {
+						slice[n+1][m-1] = "."
+						isNeighbors = true
+
+					}
+				}
+				if m-2 > 0 { //сосед слева
+					cells.cellM = m - 2
+					processed[*cells] = true
+					if slice[n][m-2] == cells.targetCell {
+						slice[n][m-2] = "."
+						isNeighbors = true
+					}
+				}
+
+				if m-1 > 0 && n-1 > 0 { //сосед слева наверху
+					cells.cellN = n - 1
+					cells.cellM = m - 1
+					processed[*cells] = true
+					if slice[n-1][m-1] == cells.targetCell {
+						slice[n-1][m-1] = "."
+						isNeighbors = true
+					}
+				}
+
+				if n-2 > 0 { //сосед наверху
+					cells.cellN = n - 2
+					processed[*cells] = true
+					if slice[n-2][m] == cells.targetCell {
+						slice[n-2][m] = "."
+						isNeighbors = true
+					}
+				}
+
+				if isNeighbors == false { //нет соседей, выход из функции
+					return slice
+				}
+				continue
 			}
 		}
 	}
