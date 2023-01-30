@@ -44,7 +44,6 @@ func main() {
 		})
 	}
 
-	printCount := 0
 	for i := 1; i < couples; i++ {
 		commonFriends := make(map[int]int)
 
@@ -65,10 +64,22 @@ func main() {
 							}
 						}
 					}
-
-				} else {
-
 				}
+			}
+
+			//удаление повторяющихся друзей
+			for _, val := range m[i] {
+				for key, _ := range commonFriends {
+					if val == key {
+						delete(commonFriends, key)
+					}
+				}
+			}
+
+			//нет общих друзей
+			if len(commonFriends) == 0 {
+				fmt.Fprintln(out, 0)
+				continue
 			}
 
 			maxVal := 0
@@ -91,15 +102,10 @@ func main() {
 			for _, v := range sliceForPrint {
 				fmt.Fprint(out, v, " ")
 			}
-			printCount++
 			fmt.Fprintln(out)
-		} /* else {
+		} else {
 			fmt.Fprintln(out, 0)
-		}*/
+		}
 	}
-	for printCount != friends {
-		fmt.Fprintln(out, 0)
-		printCount++
-	}
-	//fmt.Println(out, m)
+
 }
