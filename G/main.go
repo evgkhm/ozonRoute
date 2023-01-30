@@ -8,9 +8,13 @@ import (
 )
 
 type Person struct {
-	ID int
-	IDFriend int
-	Count int
+	ID      int
+	Friends Friends
+}
+
+type Friends struct {
+	ID    []int
+	Count []int
 }
 
 func main() {
@@ -25,6 +29,7 @@ func main() {
 	fmt.Fscan(in, &couples)
 
 	m := make(map[int][]int) //мапа со слайсами
+
 	for i := 0; i < couples; i++ {
 		var first, second int
 		fmt.Fscan(in, &first, &second)
@@ -39,30 +44,62 @@ func main() {
 		})
 	}
 
+	printCount := 0
 	for i := 1; i < couples; i++ {
-		var person Person{}
+		commonFriends := make(map[int]int)
 
 		if _, ok := m[i]; ok { //текущий чел
-			for _, val := range m[i] { //val - его друг
-
+			for _, val := range m[i] { //ind-ключ(сам чел) val - его друг
 				if _, okk := m[val]; okk { //его друг
 					for _, friendOfFriend := range m[val] { //значения его друга
 						if friendOfFriend == i { //совпадение с начальным другом (1)
 							continue
 						} else {
-							//TODO: дбавить в слайс счетчик
+							//добавление в мапу возможного друга и увеличить счетчик
+							if _, okey := commonFriends[friendOfFriend]; !okey {
+								commonFriends[friendOfFriend] = 1
+							} else {
+								counter := commonFriends[friendOfFriend]
+								counter++
+								commonFriends[friendOfFriend] = counter
+							}
 						}
 					}
-
 
 				} else {
 
 				}
 			}
-		} else {
-			fmt.Println(out, 0)
-		}
-	}
 
-	fmt.Println(out, m)
+			maxVal := 0
+			for _, val := range commonFriends {
+				if val > maxVal {
+					maxVal = val
+				}
+			}
+
+			var sliceForPrint []int
+			for key, val := range commonFriends {
+				if val == maxVal {
+					//fmt.Fprintln(out, key)
+					sliceForPrint = append(sliceForPrint, key)
+				}
+			}
+			sort.Slice(sliceForPrint, func(i, j int) bool {
+				return sliceForPrint[i] < sliceForPrint[j]
+			})
+			for _, v := range sliceForPrint {
+				fmt.Fprint(out, v, " ")
+			}
+			printCount++
+			fmt.Fprintln(out)
+		} /* else {
+			fmt.Fprintln(out, 0)
+		}*/
+	}
+	for printCount != friends {
+		fmt.Fprintln(out, 0)
+		printCount++
+	}
+	//fmt.Println(out, m)
 }
