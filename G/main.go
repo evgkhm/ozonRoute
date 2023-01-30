@@ -7,16 +7,6 @@ import (
 	"sort"
 )
 
-type Person struct {
-	ID      int
-	Friends Friends
-}
-
-type Friends struct {
-	ID    []int
-	Count []int
-}
-
 func main() {
 	in := bufio.NewReader(os.Stdin)
 	out := bufio.NewWriter(os.Stdout)
@@ -92,7 +82,6 @@ func main() {
 			var sliceForPrint []int
 			for key, val := range commonFriends {
 				if val == maxVal {
-					//fmt.Fprintln(out, key)
 					sliceForPrint = append(sliceForPrint, key)
 				}
 			}
