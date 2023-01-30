@@ -44,7 +44,7 @@ func main() {
 		})
 	}
 
-	for i := 1; i < couples; i++ {
+	for i := 1; i <= friends; i++ {
 		commonFriends := make(map[int]int)
 
 		if _, ok := m[i]; ok { //текущий чел
