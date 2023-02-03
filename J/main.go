@@ -40,25 +40,12 @@ func main() {
 	L1:
 		for len(newWord) >= 1 {
 			for _, val := range dictionary {
-				if strings.HasSuffix(val, newWord) {
+				if strings.HasSuffix(val, newWord) && word != val {
 					m[val] = newWord
 					break L1
 				}
 			}
 			newWord = trimFirstRune(newWord)
-		}
-
-		for key, _ := range m {
-			if key == word { //проверка, что слово полностью не совпадает
-				delete(m, key)
-				m[dictionary[0]] = dictionary[0]
-			}
-		}
-		for key, _ := range m {
-			if key == word { //проверка, что слово полностью не совпадает
-				delete(m, key)
-				m[dictionary[1]] = dictionary[1]
-			}
 		}
 
 		if len(m) == 0 {
