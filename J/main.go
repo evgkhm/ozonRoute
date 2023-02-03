@@ -14,24 +14,24 @@ func main() {
 	out := bufio.NewWriter(os.Stdout)
 	defer out.Flush()
 
-	var dictionarySize int
+	var dictionarySize uint16
 	fmt.Fscan(in, &dictionarySize)
 
-	var dictionary []string
-	for i := 0; i < dictionarySize; i++ {
+	var dictionary = make([]string, dictionarySize)
+	for i := uint16(0); i < dictionarySize; i++ {
 		var word string
 		fmt.Fscan(in, &word)
-		dictionary = append(dictionary, word)
+		dictionary[i] = word
 	}
 
 	sort.Slice(dictionary, func(i, j int) bool {
 		return len(dictionary[i]) > len(dictionary[j])
 	})
 
-	var requests int
+	var requests uint16
 	fmt.Fscan(in, &requests)
 
-	for i := 0; i < requests; i++ {
+	for i := uint16(0); i < requests; i++ {
 		m := make(map[string]string)
 
 		var word, newWord string
