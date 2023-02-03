@@ -1,0 +1,5 @@
+SELECT users.id, users.name
+FROM users,orders
+WHERE users.id=orders.user_id
+GROUP BY users.name, users.id
+ORDER BY users.name, users.id;
