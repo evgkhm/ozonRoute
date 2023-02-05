@@ -39,9 +39,9 @@ func main() {
 
 			j := 0
 			for j < stringTable {
-				if slice[j][sortStolbec] > slice[j+1][sortStolbec] {
+				if slice[j][sortStolbec] > slice[j+1][sortStolbec] { //сортировка по заданному столбцу
 					slice[j], slice[j+1] = slice[j+1], slice[j]
-					j = 0 //???
+					j = 0 //сортировка заново если произошла сортировка
 				} else {
 					j++
 				}
